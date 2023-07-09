@@ -2,8 +2,13 @@ import strutils
 import taskutils
 import os
 
+when defined(windows):
+    const PathSlash = "\\"
+else:
+    const PathSlash = "/"
+
 const WATODO_DIR = ".watodo"
-const WATODO_TASKS_FILE = WATODO_DIR & "\\tasks.txt"
+const WATODO_TASKS_FILE = WATODO_DIR & PathSlash & "tasks.txt"
 
 proc isInit() : bool = dirExists(WATODO_DIR) and fileExists(WATODO_TASKS_FILE)
 
