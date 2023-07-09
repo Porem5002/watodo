@@ -1,16 +1,18 @@
 # watodo
 
+![program demonstration](imgs/main.png)
+
 A little program that I made in [nim](https://nim-lang.org/) to try out the language.
 
 This is a todo list CLI program that allows the user to create tasks and later mark them as done.
 
 ## Build
 
-To build the project on your own machine, make sure you have the nim compiler correctly installed and available in your PATH environment variable.
+To build the project on your own machine, make sure you have nim installed correctly and available in your PATH environment variable.
 
 After that you just need to run the following command:
 ```
-$ nim c -o:watodo src/watodo.nim 
+$ nimble build 
 ```
 ## Usage
 The program contains a few simple commands:
