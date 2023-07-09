@@ -1,5 +1,3 @@
-import std/terminal
-import std/sugar
 import strutils
 import taskutils
 import os
@@ -7,40 +5,53 @@ import os
 const WATUDO_DIR = ".watudo"
 const WATUDO_TASKS_FILE = WATUDO_DIR & "\\tasks.txt"
 
-var tasks = newTaskList()
-
-proc isInit() : bool = dirExists(WATUDO_DIR)
+proc isInit() : bool = dirExists(WATUDO_DIR) and fileExists(WATUDO_TASKS_FILE)
 
 proc commandInit() =
     if isInit():
         stdout.writeLine("watudo is already initialized!")
     else:
         createDir(WATUDO_DIR)
+        var f = open(WATUDO_TASKS_FILE, fmWrite)
+        f.close()
 
 proc commandShow() =
+    var f = open(WATUDO_TASKS_FILE, fmRead)
+    defer: f.close()
+
+    var tasks = tasksFromFile(f)
+    defer: tasks.free()
+
     if tasks.size == 0:
         stdout.writeLine("(NO TASKS)")
         return
+
     for t in tasks.unroll:
         t.show
 
 proc commandBeginTask() =
-    var t = task()
-    t.done = false
-    t.id = uint(tasks.size)
-    stdout.writeLine("Write a name/description for the task: ")
-    t.text = stdin.readLine()
-    tasks.add(t)
-    
-    var f = open(WATUDO_TASKS_FILE, fmAppend)
-    t.writeToFile(f)
-    f.close()
+    var f = open(WATUDO_TASKS_FILE, fmReadWriteExisting)
+    defer: f.close()
 
+    var tasks = tasksFromFile(f)
+    defer: tasks.free()
+
+    var t = task(done: false, id: uint(tasks.size))
+    stdout.write("Write a name/description for the task: ")
+    t.text = stdin.readLine()
+    t.writeToFile(f)
+    
     stdout.writeLine("The new task was registered successfully!")
     t.show
 
 proc commandFinishTask() =
-    stdout.writeLine("Write the ID of the task to finish: ")
+    var f1 = open(WATUDO_TASKS_FILE, fmReadWriteExisting)
+    defer: f1.close()
+
+    var tasks = tasksFromFile(f1)
+    defer: tasks.free()
+
+    stdout.write("Write the ID of the task to finish: ")
     var id = parseUInt(stdin.readLine())
     var pt: ptr task = nil
 
@@ -58,50 +69,36 @@ proc commandFinishTask() =
 
     pt.done = true
 
-    var f = open(WATUDO_TASKS_FILE, fmWrite)
-    tasks.toFile(f)
-    f.close()
+    var f2 = open(WATUDO_TASKS_FILE, fmWrite)
+    defer: f2.close
+    tasksToFile(tasks, f2)
 
     stdout.writeLine("The task was finished successfully!")
     pt[].show
 
 proc main(): void =
-    var loopcond : proc (): bool
+    if paramCount() == 0:
+        quit(QuitSuccess)
 
-    if isatty(stdin):
-        loopcond = () => true
-    else:
-        loopcond = () => not endOfFile(stdin)
+    var command = paramStr(1)
 
-    if isInit() and fileExists(WATUDO_TASKS_FILE):
-        var f = open(WATUDO_TASKS_FILE, fmRead)
-        tasks.fromFile(f)
-        f.close()
-
-    while loopcond():
-        stdout.write(">")
-        var command = stdin.readLine() 
-
-        if command == "init":
-            commandInit()
-            continue
-
-        if command == "quit":
-            quit(QuitSuccess)
-        
-        if not isInit():
-            stdout.writeLine("watudo is not initialized for this directory, run the command 'init' to initialize it!")
-            continue
+    if command == "init":
+        commandInit()
+        return
     
-        case command:
-            of "show":
-                commandShow()
-            of "begin":
-                commandBeginTask()
-            of "finish":
-                commandFinishTask()
-            else:
-                stdout.writeLine("\'", command, "\' is not recongined as a valid command!");
+    if not isInit():
+        stdout.writeLine("watudo is not initialized for this directory!")
+        return
+
+    case command:
+        of "show":
+            commandShow()
+        of "begin":
+            commandBeginTask()
+        of "finish":
+            commandFinishTask()
+        else:
+            stdout.writeLine("\'", command, "\' is not recongined as a valid command!");
 
 when isMainModule:
     main()

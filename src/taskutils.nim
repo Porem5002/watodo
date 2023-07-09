@@ -20,6 +20,12 @@ proc newTaskList*(): taskList =
     list.data = cast[ptr task](alloc0(sizeof(task)*list.capacity))
     return list
 
+proc free*(list: var taskList) =
+    dealloc(list.data)
+    list.capacity = 0
+    list.size = 0
+    list.data = nil
+
 proc eptr*(list: var taskList, i: Natural): ptr task =
     # Equivalent to '&list.data[list.size]' in C
     return cast[ptr task](cast[ByteAddress](list.data) +% i * sizeof(task))
@@ -84,12 +90,13 @@ proc readFromFile*(f: File): task =
     t.text = f.readLine()
     return t
 
-proc toFile*(list: var taskList, f: File) =
+proc tasksToFile*(list: var taskList, f: File) =
     for t in list.unroll:
         t.writeToFile(f)
 
-proc fromFile*(list: var taskList, f: File) =
-    list.clear()
+proc tasksFromFile*(f: File): taskList =
+    var list = newTaskList()
     while not endOfFile(f):
         var t = f.readFromFile()
         list.add(t)
+    return list
