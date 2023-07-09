@@ -1,4 +1,4 @@
-# watudo
+# watodo
 
 A little program that I made in [nim](nim) to try out the language.
 
@@ -10,15 +10,15 @@ To build the project on your own machine, make sure you have the nim compiler co
 
 After that you just need to run the following command:
 ```
-$ nim c -o:watudo src/watudo.nim 
+$ nim c -o:watodo src/watodo.nim 
 ```
 ## Usage
 The program contains a few simple commands:
 ```
-.\watudo init
-.\watudo show
-.\watudo begin
-.\watudo finish
+.\watodo init
+.\watodo show
+.\watodo begin
+.\watodo finish
 ```
 
 ### 'init' command

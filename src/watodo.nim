@@ -2,21 +2,21 @@ import strutils
 import taskutils
 import os
 
-const WATUDO_DIR = ".watudo"
-const WATUDO_TASKS_FILE = WATUDO_DIR & "\\tasks.txt"
+const WATODO_DIR = ".watodo"
+const WATODO_TASKS_FILE = WATODO_DIR & "\\tasks.txt"
 
-proc isInit() : bool = dirExists(WATUDO_DIR) and fileExists(WATUDO_TASKS_FILE)
+proc isInit() : bool = dirExists(WATODO_DIR) and fileExists(WATODO_TASKS_FILE)
 
 proc commandInit() =
     if isInit():
-        stdout.writeLine("watudo is already initialized!")
+        stdout.writeLine("watodo is already initialized!")
     else:
-        createDir(WATUDO_DIR)
-        var f = open(WATUDO_TASKS_FILE, fmWrite)
+        createDir(WATODO_DIR)
+        var f = open(WATODO_TASKS_FILE, fmWrite)
         f.close()
 
 proc commandShow() =
-    var f = open(WATUDO_TASKS_FILE, fmRead)
+    var f = open(WATODO_TASKS_FILE, fmRead)
     defer: f.close()
 
     var tasks = tasksFromFile(f)
@@ -30,7 +30,7 @@ proc commandShow() =
         t.show
 
 proc commandBeginTask() =
-    var f = open(WATUDO_TASKS_FILE, fmReadWriteExisting)
+    var f = open(WATODO_TASKS_FILE, fmReadWriteExisting)
     defer: f.close()
 
     var tasks = tasksFromFile(f)
@@ -45,7 +45,7 @@ proc commandBeginTask() =
     t.show
 
 proc commandFinishTask() =
-    var f1 = open(WATUDO_TASKS_FILE, fmReadWriteExisting)
+    var f1 = open(WATODO_TASKS_FILE, fmReadWriteExisting)
     defer: f1.close()
 
     var tasks = tasksFromFile(f1)
@@ -69,7 +69,7 @@ proc commandFinishTask() =
 
     pt.done = true
 
-    var f2 = open(WATUDO_TASKS_FILE, fmWrite)
+    var f2 = open(WATODO_TASKS_FILE, fmWrite)
     defer: f2.close
     tasksToFile(tasks, f2)
 
@@ -87,7 +87,7 @@ proc main(): void =
         return
     
     if not isInit():
-        stdout.writeLine("watudo is not initialized for this directory!")
+        stdout.writeLine("watodo is not initialized for this directory!")
         return
 
     case command:
