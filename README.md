@@ -1,6 +1,6 @@
 # watodo
 
-A little program that I made in [nim](nim) to try out the language.
+A little program that I made in [nim](https://nim-lang.org/) to try out the language.
 
 This is a todo list CLI program that allows the user to create tasks and later mark them as done.
 
