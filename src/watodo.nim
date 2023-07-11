@@ -34,43 +34,40 @@ proc commandShow() =
     for t in tasks.unroll:
         t.show
 
-proc commandBeginTask() =
+proc commandBeginTask(desc: string): task =
     var f = open(WATODO_TASKS_FILE, fmReadWriteExisting)
     defer: f.close()
 
     var tasks = tasksFromFile(f)
     defer: tasks.free()
 
-    var t = task(done: false, id: uint(tasks.size))
-    stdout.write("Write a name/description for the task: ")
-    t.text = stdin.readLine()
+    var t = task(done: false, id: uint(tasks.size), text: desc)
     t.writeToFile(f)
-    
-    stdout.writeLine("The new task was registered successfully!")
-    t.show
+    return t
 
-proc commandFinishTask() =
+type status_finish_enum = enum success, alreadyDone, notFound 
+type status_finish = object
+    e: status_finish_enum
+    t: task
+proc commandFinishTask(id: uint): status_finish =
     var f1 = open(WATODO_TASKS_FILE, fmReadWriteExisting)
     defer: f1.close()
 
     var tasks = tasksFromFile(f1)
     defer: tasks.free()
 
-    stdout.write("Write the ID of the task to finish: ")
-    var id = parseUInt(stdin.readLine())
     var pt: ptr task = nil
 
     for t in tasks.unrollrefs:
         if t.id == id:
             pt = t
+            break
 
     if pt == nil:
-        stdout.writeLine("There is no task with ID ", id, "!")
-        return
+        return status_finish(e: notFound, t: task())
 
     if pt.done:
-        stdout.writeLine("The task with ID ", id, " was already finished!")
-        return
+        return status_finish(e: alreadyDone, t: task())
 
     pt.done = true
 
@@ -78,8 +75,13 @@ proc commandFinishTask() =
     defer: f2.close
     tasksToFile(tasks, f2)
 
-    stdout.writeLine("The task was finished successfully!")
-    pt[].show
+    return status_finish(e: success, t: pt[])
+
+proc askUserToProceed() =
+    stdout.write("Are you sure you want to execute the command?(y/n) ")
+    var c = stdin.readChar()
+    if c != 'y' and c != 'Y':
+        quit(QuitSuccess)
 
 proc main(): void =
     if paramCount() == 0:
@@ -99,11 +101,49 @@ proc main(): void =
         of "show":
             commandShow()
         of "begin":
-            commandBeginTask()
+            if(paramCount() < 2):
+                stdout.writeLine("Error: Command ", command," expected the description of the task to be passed as it's first and only argument!")
+                quit(QuitFailure)
+            if(paramCount() > 2):
+                stdout.writeLine("Error: To many arguments passed to command ", command,"!")
+                quit(QuitFailure)
+            askUserToProceed()
+            var t = commandBeginTask(paramStr(2))
+            stdout.writeLine("The task was registered successfully!")
+            t.show
         of "finish":
-            commandFinishTask()
+            if(paramCount() < 2):
+                stdout.writeLine("Error: Command ", command," expected the description of the task to be passed as it's first and only argument!")
+                quit(QuitFailure)
+            if(paramCount() > 2):
+                stdout.writeLine("Error: To many arguments passed to command ", command,"!")
+                quit(QuitFailure)
+
+            var id: uint = 0
+
+            try:
+                id = parseUInt(paramStr(2))
+            except ValueError:
+                stdout.writeLine("Error: Argument 1 with value '", paramStr(2),"' cannot be converted to a not a valid ID value!")
+                quit(QuitFailure)
+
+            askUserToProceed()
+            var status = commandFinishTask(id)
+
+            case status.e:
+                of success:
+                    stdout.writeLine("The task was finished succesfully!")
+                    status.t.show
+                    quit(QuitSuccess)
+                of alreadyDone:
+                    stdout.writeLine("The task was already marked as finished!")
+                    quit(QuitSuccess)
+                of notFound:
+                    stdout.writeLine("Error: No task with the given ID exists!")
+                    quit(QuitFailure)
         else:
-            stdout.writeLine("\'", command, "\' is not recongined as a valid command!");
+            stdout.writeLine("Error: ", command, " is not a valid command!");
+            quit(QuitFailure)
 
 when isMainModule:
     main()
