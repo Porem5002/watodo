@@ -23,38 +23,50 @@ The program contains a few simple commands:
 - init
 - show
 - begin
+- remove
 - finish
 
 ### 'init' command
 Initializes a new todo list for the current directory (there can only be 1 todo list per directory) 
 
 ### 'show' command
-Shows all the registered tasks, displaying their status, ID and the description of the task.
+Shows all the registered tasks, displaying their __status__(TODO or DONE), __ID__ and the __description__ of the task.
 
 ### 'begin' command
 Registers a new task into the todo list.
 
-When using this command you will need to provide a description for the task, and you can do that like this:
+When using this command you will need to provide a __description__ for the task, and you can do that like this:
 ```bash
 $ watodo begin "Task Description"
 ```
-So if you want to create a task with the description "Fix Bugs", this is the command you will need to type:
+So if you want to create a task with the __description__ "Fix Bugs", this is the command you will need to type:
 ```bash
 $ watodo begin "Fix Bugs"
+```
+
+### 'remove' command
+Removes a task from the todo list.
+
+When using this command you will need to specify the __ID__ of the task that you want to remove, this is the way to do it:
+```bash
+$ watodo remove ID
+```
+So if you want to remove a task that has __ID__ of 2, you do it like this:
+```bash
+$ watodo remove 2
 ```
 
 ### 'finish' command
 Marks a task as finished.
 
-When using this command you will need to specify the ID of the task that you want to finish, this is the way to do it:
+When using this command you will need to specify the __ID__ of the task that you want to finish, this is the way to do it:
 ```bash
 $ watodo finish ID
 ```
-So if you want to finish a task that has ID of 3, you do it like this:
+So if you want to finish a task that has __ID__ of 3, you do it like this:
 ```bash
 $ watodo finish 3
 ```
-__Note:__ You can see the IDs of the tasks through the __show__ command.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

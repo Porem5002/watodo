@@ -13,12 +13,24 @@ type taskList* = object
 
 const LIST_DEF_CAP = 10
 
+proc eptr*(list: var taskList, i: Natural): ptr task
+
 proc newTaskList*(): taskList =
     var list = taskList()
     list.capacity = LIST_DEF_CAP
     list.size = 0
     list.data = cast[ptr task](alloc0(sizeof(task)*list.capacity))
     return list
+
+proc remat*(list: var taskList, i: Natural) =
+    if i == list.size-1:
+        list.size -= 1
+        return
+    
+    var dest = list.eptr(i)
+    var src = list.eptr(i+1)
+    moveMem(dest, src, sizeof(task)*(list.size-i-1))
+    list.size -= 1
 
 proc free*(list: var taskList) =
     dealloc(list.data)
