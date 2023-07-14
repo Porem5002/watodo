@@ -41,7 +41,8 @@ proc commandAddTask(desc: string): task =
     var tasks = tasksFromFile(f)
     defer: tasks.free()
 
-    var t = task(done: false, id: uint(tasks.size), text: desc)
+    var nextId = tasks.getMaxId() + 1
+    var t = task(done: false, id: nextId, text: desc)
     t.writeToFile(f)
     return t
 

@@ -68,6 +68,15 @@ iterator unrollrefs*(list: var taskList): ptr task =
     for i in countup(0, list.size-1):
         yield list.eptr(i)
 
+proc getMaxId*(list: var taskList): uint = 
+    var maxid: uint = low(uint)
+    
+    for t in list.unroll:
+        if t.id > maxid:
+            maxid = t.id
+
+    return maxid
+
 proc show*(t: task) =
     if t.done:
         stdout.styledWrite("--", fgGreen, "DONE: ")
