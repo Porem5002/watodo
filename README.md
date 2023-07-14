@@ -22,7 +22,7 @@ Finally, it would be a good idea to make sure the executable is available in you
 The program contains a few simple commands:
 - init
 - show
-- begin
+- add
 - remove
 - finish
 
@@ -32,16 +32,16 @@ Initializes a new todo list for the current directory (there can only be 1 todo 
 ### 'show' command
 Shows all the registered tasks, displaying their __status__(TODO or DONE), __ID__ and the __description__ of the task.
 
-### 'begin' command
-Registers a new task into the todo list.
+### 'add' command
+Adds a new task to the todo list.
 
 When using this command you will need to provide a __description__ for the task, and you can do that like this:
 ```bash
-$ watodo begin "Task Description"
+$ watodo add "Task Description"
 ```
 So if you want to create a task with the __description__ "Fix Bugs", this is the command you will need to type:
 ```bash
-$ watodo begin "Fix Bugs"
+$ watodo add "Fix Bugs"
 ```
 
 ### 'remove' command

@@ -34,7 +34,7 @@ proc commandShow() =
     for t in tasks.unroll:
         t.show
 
-proc commandBeginTask(desc: string): task =
+proc commandAddTask(desc: string): task =
     var f = open(WATODO_TASKS_FILE, fmReadWriteExisting)
     defer: f.close()
 
@@ -127,7 +127,7 @@ proc main(): void =
     case command:
         of "show":
             commandShow()
-        of "begin":
+        of "add":
             if(paramCount() < 2):
                 stdout.writeLine("Error: Command ", command," expected the description of the task to be passed as it's first and only argument!")
                 quit(QuitFailure)
@@ -135,7 +135,7 @@ proc main(): void =
                 stdout.writeLine("Error: To many arguments passed to command ", command,"!")
                 quit(QuitFailure)
             askUserToProceed()
-            var t = commandBeginTask(paramStr(2))
+            var t = commandAddTask(paramStr(2))
             stdout.writeLine("The task was registered successfully!")
             t.show
         of "remove":
